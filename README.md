@@ -18,10 +18,10 @@
 
 ``` virtualenv iss_map_tracker_env -p -python3.10  ``` ==> 
 ``` pip install -r requirements.txt ```
-### Additional installation(maybe you already have it installed or not ;) : tkinter, kivy, fonts 
+###### <p> Additional installation(maybe you already have it installed or not ;) : tkinter, kivy, fonts  </p>
 
 
-![alt text](https://avatars2.githubusercontent.com/u/11632545?v=3&s=200)
+![desc_img](https://github.com/TribQq/iss_track_map/blob/master/assets/description/description_1.png)
 
 
 
