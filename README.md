@@ -2,8 +2,9 @@
 
 <ul>
 <h2>Functional:</h2>
-<li>daily nasa pic</li>
-<li>iss map tracker</li>
+<li>Astronomy Picture of the Day</li>
+<li>ISS map tracker</li>
+<li>(^_-)≡☆ 2.5 styles(old, new(2 map))</li>
 </ul>
 
 
