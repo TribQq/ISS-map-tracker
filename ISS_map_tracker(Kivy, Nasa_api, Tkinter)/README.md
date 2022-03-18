@@ -22,7 +22,7 @@
 ###### <p> Additional installation(maybe you already have it installed or not ;) : tkinter, kivy, fonts  </p>
 
 
-![desc_img](https://github.com/TribQq/iss_track_map/blob/master/assets/description/description_1.png)
+![desc_img](https://github.com/TribQq/ISS-map-tracker/blob/master/ISS_map_tracker(Kivy%2C%20Nasa_api%2C%20Tkinter)/assets/description/description_1.png)
 
 
 
