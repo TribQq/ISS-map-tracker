@@ -11,3 +11,7 @@ ISS_map_tracker(Kivy, Nasa_api, Tkinter)/description_and_ideas.txt
 notesApp(DjangoRest, React)/notesApp_env
 notesApp(DjangoRest, React)/react_frontend/node_modules
 notesApp(DjangoRest, React)/react_frontend/public
+
+
+rpg_dmg_calc/rpg_dmg_calc_env
+
