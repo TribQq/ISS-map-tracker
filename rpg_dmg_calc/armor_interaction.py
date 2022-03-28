@@ -1,5 +1,3 @@
-
-
 from typing import List, Tuple,Dict
 import yaml
 from pathlib import Path
@@ -84,21 +82,3 @@ def get_damage(
         print(f"Remaining damage {remaining_damage}")
     return remaining_damage
 
-
-
-print(
-    get_damage(
-        15,
-        "p",
-        8,
-        get_armor_layers(
-            our_armor,
-            [
-                "Helmar's Shield of Meginbald",
-                "Helmar's Warrior Priest Armour",
-                "Helmar's Warrior Priest Armour (Padded Cap)",
-            ],
-            body_part="left_arm",
-        ),
-        )
-    )
