@@ -14,8 +14,8 @@ from armor_interaction import (
 )
 
 def calculate_damage(ev=None) -> Tuple[Optional[int], str]:
-    damage = int(document["damage"].value)
-    penetration = int(document["penetration"].value)
+    damage = int(document["input_damage"].value)
+    penetration = int(document["input_penetration"].value)
     damage_type = get_damage_type()
     if not damage_type:
         return None, "Damage type not set"
@@ -44,7 +44,7 @@ def calculate_damage(ev=None) -> Tuple[Optional[int], str]:
 def update_damage(ev=None):
     print("UPDATING")
     damage, explanation = calculate_damage(ev)
-    if not damage:
+    if damage is None:
         damage_str = f"Invalid ({explanation})"
     else:
         damage_str = str(damage)
@@ -65,7 +65,9 @@ def setup_damage_types():
             name="damage_type",
             value=damage_type,
         )
-        document["damage_type"] <= damage_type
+        document["damage_type"] <= html.LABEL(
+            damage_type, **{"for": f"damage_type_{damage_type}"}
+        )
 
 
 
@@ -86,7 +88,7 @@ def setup_armor_selection():
             name="armor_selection",
             value=name,
         )
-        div <= name
+        div <= html.LABEL(name, **{"for": f"armor_selection_{name}"})
         document["armor_selection"] <= div
 
 
@@ -104,7 +106,9 @@ def setup_body_parts():
             name="body_part",
             value=body_part,
         )
-        document["body_part"] <= body_part
+        document["body_part"] <= html.LABEL(
+            body_part, **{"for": f"body_part_{body_part}"}
+        )
 
 
 def setup_hide_loading_placeholders():
@@ -112,19 +116,36 @@ def setup_hide_loading_placeholders():
         print(item)
         item.style.display = "none"
         
-        
+  
+  
+def update_damage_slider(ev=None) -> None:
+    print("update slider")
+    document["value_input_damage"].html = str(document["input_damage"].value)
+
+
+def update_penetration_slider(ev=None) -> None:
+    print("update slider")
+    document["value_input_penetration"].html = str(
+        document["input_penetration"].value
+    )
+
+       
 def setup():
     setup_damage_types()
     setup_armor_selection()
     setup_body_parts()
     for part in [
-        "damage",
-        "penetration",
+        "input_damage",
+        "input_penetration",
         "body_part",
         "armor_selection",
         "damage_type",
     ]:
         document[part].bind("click", update_damage)
+    document["input_damage"].bind("input", update_damage_slider)
+    document["input_penetration"].bind("input", update_penetration_slider)
+    update_damage_slider()
+    update_penetration_slider()
     update_damage()
     setup_hide_loading_placeholders()
 
