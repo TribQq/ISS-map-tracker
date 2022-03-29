@@ -4,14 +4,16 @@ from typing import Optional, Tuple, List
 
 from browser import document, html
 
-
 from armor_interaction import (
     damage_types,
-    our_armor,
     get_damage,
-    get_armor_layers,
     body_parts,
+    PredefinedArmorDb,
 )
+
+armor_db = PredefinedArmorDb()
+armor_db.load_json()
+
 
 def calculate_damage(ev=None) -> Tuple[Optional[int], str]:
     damage = int(document["input_damage"].value)
@@ -32,8 +34,7 @@ def calculate_damage(ev=None) -> Tuple[Optional[int], str]:
         damage,
         damage_type,
         penetration,
-        get_armor_layers(
-            our_armor,
+        armor_db.get_armor_layers(
             armor,
             body_part=body_part,
         ),
@@ -73,14 +74,13 @@ def setup_damage_types():
 
 def get_armor_selection() -> List[str]:
     return [
-        name
-        for name in our_armor
-        if document[f"armor_selection_{name}"].checked
+        name for name in armor_db if document[f"armor_selection_{name}"].checked
     ]
 
 
+
 def setup_armor_selection():
-    for name in our_armor:
+    for name in armor_db:
         div = html.DIV()
         div <= html.INPUT(
             type="checkbox",
