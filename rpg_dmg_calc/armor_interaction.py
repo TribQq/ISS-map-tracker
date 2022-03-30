@@ -12,6 +12,8 @@ body_parts = [
     "right_leg",
 ]
 
+armor_types = ["Ls", "Lh", "M", "H"]
+
 
 class PredefinedArmorDb:
     def __init__(self):
@@ -26,12 +28,13 @@ class PredefinedArmorDb:
         }
 
     @staticmethod
-    def _resolve_layer(layer_code: str) -> Tuple[str, int]:
-        if layer_code.endswith("2"):
-            return layer_code[:-1], 2
-        else:
-            return layer_code, 1
-
+    def parser_armor_layer(layer_code: str) -> Tuple[str, int]:
+        for armor_type in armor_types:
+            for ap in range(1, len(layer_code) // len(armor_type) + 1):
+                if layer_code == armor_type * ap:
+                    return (armor_type, ap)
+        raise ValueError(f"Doesn't seem like a valid armor code: {layer_code}")
+   
     def _get_armor_layers(
         self, name: str, body_part="default"
     ) -> List[Tuple[str, int]]:
@@ -39,26 +42,35 @@ class PredefinedArmorDb:
         if body_part not in armor["armor"]:
             body_part = "default"
         return [
-            self._resolve_layer(layer) for layer in armor["armor"][body_part]
+            self.parser_armor_layer(layer)
+            for layer in armor["armor"][body_part]
         ]
 
     def get_armor_layers(
-        self, names: List[str], body_part="default"
+        self,
+        names: List[str],
+        body_part="default",
+        custom=None,
     ) -> List[Tuple[str, int]]:
         """
         
         Args:
             names: Names of armors
             body_part:
+            custom: Replace the name "custom" with this value
        
         Returns:
         
         """
         layers = []
         for name in names:
-            layers.extend(
-                self._get_armor_layers(name=name, body_part=body_part)
-            )
+            if name == "custom" and custom is not None:
+                layers.extend(custom)
+            else:
+                layers.extend(
+                    self._get_armor_layers(name=name, body_part=body_part)
+                )
+        print(layers)
         return layers
     
     def __iter__(self):
