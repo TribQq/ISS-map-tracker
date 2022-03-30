@@ -79,12 +79,7 @@
  }
  .property-line.last{
    margin: 0 0 10px;
- }
- .abilities{
-   text-align: center;
-   color: #922610;
- }
- 
+ } 
  .property-block h4,
  .property-block p{
    font-size: 13.5px;
@@ -98,7 +93,6 @@
  .property-block{
    padding: 10px 2px 0;
  }
- 
  h3{
    border-bottom: 1px solid #7A200D;
    color: #7A200D;
@@ -133,4 +127,19 @@
    .stat-block{
      margin: 20px 0;
    }
+ }
+
+ #result {
+   font-size: 50px;
+   display: inline;
+ }
+ 
+ .hide_me_after_setup {
+   font-size:  12px;
+ }
+ 
+ .result_area {
+   margin-top: 20px;
+   margin-bottom: 20px;
+   text-align: center;
  }
