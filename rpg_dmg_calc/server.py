@@ -22,9 +22,12 @@ def calculate_damage(ev=None) -> Tuple[Optional[int], str]:
     if not damage_type:
         return None, "Damage type not set"
     armor, armor_error = get_armor_layers()
-    print(armor, armor_error)
     if armor_error:
+        document["armor_selection_result"].html = armor_error
         return None, armor_error
+    document[
+        "armor_selection_result"
+    ].html = armor_db.armor_layers_to_string_representation(armor)
     assert damage_type
     result, explanation_lines = damage_calculator.get_damage(
         damage=damage,
@@ -39,7 +42,7 @@ def update_damage(ev=None):
     print("UPDATING")
     damage, explanation = calculate_damage(ev)
     if damage is None:
-        damage_str = f"Invalid ({explanation})"
+        damage_str = "?"
     else:
         damage_str = str(damage)
     document["result"].html = damage_str
@@ -56,7 +59,6 @@ def get_damage_type() -> Optional[str]:
 def get_armor_layers():
     body_part = get_body_part()
     armor = get_armor_selection()
-    print("ARMOR", armor)
     layer_specifications = (
         document["armor_selection_custom_input"]
         .value.strip()
@@ -71,7 +73,6 @@ def get_armor_layers():
     except ValueError:
         return None, "Couldn't parse custom armor setting string"
     else:
-        print("Custom armor", custom_armor)
         return (
             armor_db.get_armor_layers(
                 armor, body_part=body_part, custom=custom_armor
