@@ -1,8 +1,8 @@
 #!/usr/bin/env python3
 
 import pytest
-from armor_interaction import PredefinedArmorDb, DamageCalculator
 
+from armor_interaction import PredefinedArmorDb, DamageCalculator, ArmorLayer
 
 
 @pytest.fixture
@@ -29,17 +29,15 @@ def test_get_armor_layers(armor_db: PredefinedArmorDb):
         )
         == [("H", 2), ("M", 1), ("Ls", 2)]
     )
-
-
+    
+    
 def test_get_damage(damage_calculator: DamageCalculator):
     assert (
         damage_calculator.get_damage(
-            15, "p", 8, [("H", 2), ("M", 1), ("Ls", 2)]
+            15,
+            "p",
+            8,
+            [ArmorLayer("H", 2), ArmorLayer("M", 1), ArmorLayer("Ls", 2)],
         )[0]
         == 11
     )
-
-def test_get_damage_no_armor(damage_calculator: DamageCalculator):
-    assert damage_calculator.get_damage(15, "p", 8, [])[0] == 15
-    assert damage_calculator.get_damage(15, "p", 0, [])[0] == 15
-    assert damage_calculator.get_damage(15, "x", 0, [])[0] == 15
