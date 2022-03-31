@@ -1,8 +1,8 @@
-from typing import List, Tuple, Dict, Any, NamedTuple
+from typing import List, Tuple, Dict
 import json
-
 import csv
 
+# todo: use enums
 body_parts = {
     "head": "head",
     "body": "body",
@@ -11,10 +11,7 @@ body_parts = {
     "left_leg": "left leg",
     "right_leg": "right leg",
 }
-
 armor_types = ["Ls", "Lh", "M", "H"]
-
-
 damage_types = {
     "b": "bludgeoning",
     "e": "explosive",
@@ -23,59 +20,71 @@ damage_types = {
     "x": "energy",
 }
 
-class ArmorLayer(NamedTuple):
-    armor_type: str
-    armor_points: int
-    
-    
-class PredefinedArmorDb:
-    def __init__(self):
-        self.armor_dict: Dict[str, Any] = {}
 
-    def load_json(self, path="data/predefined_armor_pieces.json"):
-        with open(path) as inf:
-            _armor = json.load(inf)
-        self.armor_dict = {
-            **self.armor_dict,
-            **{armor["name"]: armor for armor in _armor},
-        }
+class ArmorLayer:
+    def __init__(self, armor_type: str, armor_points: int):
+        self.armor_type = armor_type
+        self.armor_points = armor_points
 
-    @staticmethod
-    def parse_armor_layer_string(layer_code: str) -> ArmorLayer:
+    @classmethod
+    def from_string(cls, layer_code: str):
         for armor_type in armor_types:
             for ap in range(1, len(layer_code) // len(armor_type) + 1):
                 if layer_code == armor_type * ap:
-                    return ArmorLayer(armor_type=armor_type, armor_points=ap)
+                    return cls(armor_type=armor_type, armor_points=ap)
         raise ValueError(f"Doesn't seem like a valid armor code: {layer_code}")
-   
-    @staticmethod
-    def armor_layer_to_string_representation(armor_layer: ArmorLayer) -> str:
-        assert armor_layer.armor_points >= 1
-        return armor_layer.armor_type * armor_layer.armor_points
+
+    def __repr__(self):
+        return self.armor_type * self.armor_points
+
+    def __eq__(self, other):
+        return self.__dict__ == other.__dict__
+
+
+class PredefinedArmor:
+    def __init__(
+        self, name: str, bodypart_to_layers: Dict[str, List[ArmorLayer]]
+    ):
+        self.name = name
+        self._bodypart_to_layers = bodypart_to_layers
+    def get_layers(self, body_part: str) -> List[ArmorLayer]:
+        if body_part not in self._bodypart_to_layers:
+            body_part = "default"
+        return self._bodypart_to_layers[body_part]
+class PredefinedArmorDb:
+    def __init__(self):
+        self.armor_dict: Dict[str, PredefinedArmor] = {}
+    def load_json(self, path="data/predefined_armor_pieces.json"):
+        with open(path) as inf:
+            _armor = json.load(inf)
+        _new_armor = [
+            PredefinedArmor(
+                name=a["name"],
+                bodypart_to_layers={
+                    body_part: [
+                        ArmorLayer.from_string(lc) for lc in layer_codes
+                    ]
+                    for body_part, layer_codes in a["armor"].items()
+                },
+            )
+            for a in _armor
+        ]
+        self.armor_dict = {
+            **self.armor_dict,
+            **{armor.name: armor for armor in _new_armor},
+        }
 
     @staticmethod
     def armor_layers_to_string_representation(layers: List[ArmorLayer]) -> str:
         if layers:
-            return " ".join(
-                [
-                    PredefinedArmorDb.armor_layer_to_string_representation(
-                        layer                    )
-                    for layer in layers                ]
-            )
+            return " ".join([str(layer) for layer in layers])
         else:
             return "No layers."
-        
+
     def _get_armor_layers(
         self, name: str, body_part="default"
     ) -> List[ArmorLayer]:
-        armor = self.armor_dict[name]
-        if body_part not in armor["armor"]:
-            body_part = "default"
-        return [
-            self.parse_armor_layer_string(layer_code)
-            for layer_code in armor["armor"][body_part]
-        ]
-
+        return self.armor_dict[name].get_layers(body_part=body_part)
     def get_armor_layers(
         self,
         names: List[str],
@@ -83,14 +92,11 @@ class PredefinedArmorDb:
         custom=None,
     ) -> List[ArmorLayer]:
         """
-        
         Args:
             names: Names of armors
             body_part:
             custom: Replace the name "custom" with this value
-       
         Returns:
-        
         """
         layers = []
         for name in names:
@@ -101,11 +107,8 @@ class PredefinedArmorDb:
                     self._get_armor_layers(name=name, body_part=body_part)
                 )
         return layers
-    
     def __iter__(self):
         return iter(self.armor_dict)
-
-
 class DamageCalculator:
     def __init__(
         self, armor_interaction_path="data/armor_weapon_interaction.csv"
@@ -121,7 +124,6 @@ class DamageCalculator:
                 key = (row[0], row[1], int(row[2]))
                 value = int(row[3])
                 self.armor_weapon_interaction[key] = value
-
     def get_damage(
         self,
         damage: int,
