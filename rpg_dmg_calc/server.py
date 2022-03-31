@@ -66,20 +66,21 @@ def get_armor_layers():
         .replace(",", " ")
         .split()
     )
-    try:
-        custom_armor = [
-            PredefinedArmorDb.parse_armor_layer_string(ls)
-            for ls in layer_specifications
-        ]
-    except ValueError:
-        return None, "Couldn't parse custom armor setting string"
-    else:
-        return (
-            armor_db.get_armor_layers(
-                armor, body_part=body_part, custom=custom_armor
-            ),
-            "",
-        )
+    custom_armor = None
+    if document["armor_selection_custom"].checked:
+        try:
+            custom_armor = [
+                PredefinedArmorDb.parse_armor_layer_string(ls)
+                for ls in layer_specifications
+            ]
+        except ValueError:
+            return None, "Couldn't parse custom armor setting string"
+    return (
+        armor_db.get_armor_layers(
+            armor, body_part=body_part, custom=custom_armor
+        ),
+        "",
+    )
 
 
 def setup_damage_types():
@@ -161,15 +162,16 @@ def setup():
     setup_armor_selection()
     setup_body_parts()
     for part in [
-        "input_damage",
-        "input_penetration",
         "body_part",
         "armor_selection",
         "damage_type",
     ]:
         document[part].bind("click", update_damage)
-    document["input_damage"].bind("input", update_damage_slider)
-    document["input_penetration"].bind("input", update_penetration_slider)
+    for event in ["input", "change"]:
+        document["input_damage"].bind(event, update_damage)
+        document["input_damage"].bind(event, update_damage_slider)
+        document["input_penetration"].bind(event, update_damage)
+        document["input_penetration"].bind(event, update_penetration_slider)
     for event in ["keydown", "paste", "input"]:
         document["armor_selection_custom_input"].bind(event, update_damage)
     update_damage_slider()
