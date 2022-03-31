@@ -53,7 +53,7 @@ class PredefinedArmor:
         return self._bodypart_to_layers[body_part]
 class PredefinedArmorDb:
     def __init__(self):
-        self.armor_dict: Dict[str, PredefinedArmor] = {}
+        self._armor_dict: Dict[str, PredefinedArmor] = {}
     def load_json(self, path="data/predefined_armor_pieces.json"):
         with open(path) as inf:
             _armor = json.load(inf)
@@ -69,8 +69,8 @@ class PredefinedArmorDb:
             )
             for a in _armor
         ]
-        self.armor_dict = {
-            **self.armor_dict,
+        self._armor_dict = {
+            **self._armor_dict,
             **{armor.name: armor for armor in _new_armor},
         }
 
@@ -81,10 +81,6 @@ class PredefinedArmorDb:
         else:
             return "No layers."
 
-    def _get_armor_layers(
-        self, name: str, body_part="default"
-    ) -> List[ArmorLayer]:
-        return self.armor_dict[name].get_layers(body_part=body_part)
     def get_armor_layers(
         self,
         names: List[str],
@@ -103,12 +99,14 @@ class PredefinedArmorDb:
             if name == "custom" and custom is not None:
                 layers.extend(custom)
             else:
-                layers.extend(
-                    self._get_armor_layers(name=name, body_part=body_part)
-                )
+                layers.extend(self[name].get_layers(body_part=body_part))
         return layers
     def __iter__(self):
-        return iter(self.armor_dict)
+        return iter(self._armor_dict)
+
+    def __getitem__(self, item):
+        return self._armor_dict[item]
+
 class DamageCalculator:
     def __init__(
         self, armor_interaction_path="data/armor_weapon_interaction.csv"
