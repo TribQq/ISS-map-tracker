@@ -1,7 +1,6 @@
 from typing import List, Tuple, Dict
 import json
 import csv
-
 # todo: use enums
 body_parts = {
     "head": "head",
@@ -19,13 +18,10 @@ damage_types = {
     "s": "slicing",
     "x": "energy",
 }
-
-
 class ArmorLayer:
     def __init__(self, armor_type: str, armor_points: int):
         self.armor_type = armor_type
         self.armor_points = armor_points
-
     @classmethod
     def from_string(cls, layer_code: str):
         for armor_type in armor_types:
@@ -33,14 +29,10 @@ class ArmorLayer:
                 if layer_code == armor_type * ap:
                     return cls(armor_type=armor_type, armor_points=ap)
         raise ValueError(f"Doesn't seem like a valid armor code: {layer_code}")
-
     def __repr__(self):
         return self.armor_type * self.armor_points
-
     def __eq__(self, other):
         return self.__dict__ == other.__dict__
-
-
 class PredefinedArmor:
     def __init__(
         self, name: str, bodypart_to_layers: Dict[str, List[ArmorLayer]]
@@ -51,6 +43,15 @@ class PredefinedArmor:
         if body_part not in self._bodypart_to_layers:
             body_part = "default"
         return self._bodypart_to_layers[body_part]
+
+
+def armor_layers_to_string_representation(layers: List[ArmorLayer]) -> str:
+    if layers:
+        return " ".join([str(layer) for layer in layers])
+    else:
+        return "No layers."
+
+
 class PredefinedArmorDb:
     def __init__(self):
         self._armor_dict: Dict[str, PredefinedArmor] = {}
@@ -74,13 +75,6 @@ class PredefinedArmorDb:
             **{armor.name: armor for armor in _new_armor},
         }
 
-    @staticmethod
-    def armor_layers_to_string_representation(layers: List[ArmorLayer]) -> str:
-        if layers:
-            return " ".join([str(layer) for layer in layers])
-        else:
-            return "No layers."
-
     def get_armor_layers(
         self,
         names: List[str],
@@ -103,9 +97,12 @@ class PredefinedArmorDb:
         return layers
     def __iter__(self):
         return iter(self._armor_dict)
-
     def __getitem__(self, item):
         return self._armor_dict[item]
+
+    def items(self):
+        return self._armor_dict.items()
+
 
 class DamageCalculator:
     def __init__(
