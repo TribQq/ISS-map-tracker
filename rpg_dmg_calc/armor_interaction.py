@@ -43,13 +43,19 @@ class PredefinedArmor:
         if body_part not in self._bodypart_to_layers:
             body_part = "default"
         return self._bodypart_to_layers[body_part]
-
-
 def armor_layers_to_string_representation(layers: List[ArmorLayer]) -> str:
     if layers:
         return " ".join([str(layer) for layer in layers])
     else:
         return "No layers."
+
+
+def get_armor_layers_from_string_representation(
+    string: str,
+) -> List[ArmorLayer]:
+    return [
+        ArmorLayer.from_string(ls) for ls in string.replace(",", " ").split()
+    ]
 
 
 class PredefinedArmorDb:
@@ -74,7 +80,6 @@ class PredefinedArmorDb:
             **self._armor_dict,
             **{armor.name: armor for armor in _new_armor},
         }
-
     def get_armor_layers(
         self,
         names: List[str],
@@ -99,11 +104,8 @@ class PredefinedArmorDb:
         return iter(self._armor_dict)
     def __getitem__(self, item):
         return self._armor_dict[item]
-
     def items(self):
         return self._armor_dict.items()
-
-
 class DamageCalculator:
     def __init__(
         self, armor_interaction_path="data/armor_weapon_interaction.csv"

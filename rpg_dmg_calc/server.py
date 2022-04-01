@@ -6,8 +6,8 @@ from armor_interaction import (
     PredefinedArmorDb,
     body_parts,
     damage_types,
-    ArmorLayer,
     armor_layers_to_string_representation,
+    get_armor_layers_from_string_representation,
 )
 
 armor_db = PredefinedArmorDb()
@@ -53,16 +53,10 @@ def get_armor_layers():
     armor = get_armor_selection()
     custom_armor = None
     if "custom" in armor:
-        layer_specifications = (
-            document["armor_selection_custom_input"]
-            .value.strip()
-            .replace(",", " ")
-            .split()
-        )
         try:
-            custom_armor = [
-                ArmorLayer.from_string(ls) for ls in layer_specifications
-            ]
+            custom_armor = get_armor_layers_from_string_representation(
+                document["armor_selection_custom_input"].value.strip()
+            )
         except ValueError:
             return None, "Couldn't parse custom armor setting string"
     return (
@@ -89,7 +83,6 @@ def get_armor_selection() -> List[str]:
         for name in [*list(armor_db), "custom"]
         if document[f"armor_selection_{name}"].checked
     ]
-
 def setup_armor_selection():
     for name in [*list(armor_db), "custom"]:
         div = html.DIV(id=f"div_{name}")
@@ -107,16 +100,12 @@ def setup_armor_selection():
             div <= " "
             div <= html.SPAN(id=f"span_{name}", **{"class": ["armor_mirror"]})
         document["armor_selection"] <= div
-
-
 def update_armor_selection_mirror(*ev):
     for name, armor in armor_db.items():
         armor_layer_str = armor_layers_to_string_representation(
             armor.get_layers(body_part=get_body_part())
         )
         document[f"span_{name}"].html = f"({armor_layer_str})"
-
-
 def get_body_part():
     for body_part in body_parts:
         if document[f"body_part_{body_part}"].checked:
@@ -165,6 +154,4 @@ def setup():
     update_damage()
     setup_hide_loading_placeholders()
     update_armor_selection_mirror()
-
-
 setup()
