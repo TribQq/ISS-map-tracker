@@ -1,7 +1,6 @@
 from typing import List, Tuple, Dict, NamedTuple, Optional
 import json
 import csv
-
 # todo: use enums
 body_parts = {
     "head": "head",
@@ -58,40 +57,39 @@ def get_armor_layers_from_string_representation(
 class PredefinedArmorDb:
     def __init__(self):
         self._armor_dict: Dict[str, PredefinedArmor] = {}
+
     def load_json(self, path="data/predefined_armor_pieces.json"):
+        """Load armor configuration from json file and add it to the available
+        armors.
+        """
         with open(path) as inf:
             _armor = json.load(inf)
         for a in _armor:
+            bodypart_to_layers = {}
             for body_part, layer_codes in a["armor"].items():
-                print([ArmorLayer.from_string(lc) for lc in layer_codes])
-        _new_armor = [
-            PredefinedArmor(
-                name=a["name"],
-                bodypart_to_layers={
-                    body_part: [
-                        ArmorLayer.from_string(lc) for lc in layer_codes
-                    ]
-                    for body_part, layer_codes in a["armor"].items()
-                },
+                armor_layers = [
+                    ArmorLayer.from_string(lc) for lc in layer_codes
+                ]
+                bodypart_to_layers[body_part] = armor_layers
+            _new_armor = PredefinedArmor(
+                name=a["name"], bodypart_to_layers=bodypart_to_layers
             )
-            for a in _armor
-        ]
-        self._armor_dict = {
-            **self._armor_dict,
-            **{armor.name: armor for armor in _new_armor},
-        }
+            self._armor_dict[_new_armor.name] = _new_armor
+
     def get_armor_layers(
         self,
         names: List[str],
         body_part="default",
         custom=None,
     ) -> List[ArmorLayer]:
-        """
+        """Get armor layers provided by a list of armor elements at a specific
+        body part.
         Args:
             names: Names of armors
             body_part:
             custom: Replace the name "custom" with this value
         Returns:
+            list of armor layers
         """
         layers = []
         for name in names:
@@ -106,13 +104,9 @@ class PredefinedArmorDb:
         return self._armor_dict[item]
     def items(self):
         return self._armor_dict.items()
-
-
 class DamageResult(NamedTuple):
     value: Optional[int]
     explanation: str
-
-
 class DamageCalculator:
     def __init__(
         self, armor_interaction_path="data/armor_weapon_interaction.csv"
