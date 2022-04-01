@@ -1,12 +1,9 @@
 #!/usr/bin/env python3
-
 import json
-from typing import Optional, Tuple, List, Any, Dict
+from typing import Optional, List, Any, Dict
 import collections
-
 from browser import document, html
 from browser.local_storage import storage
-
 from armor_interaction import (
     DamageCalculator,
     PredefinedArmorDb,
@@ -14,45 +11,42 @@ from armor_interaction import (
     damage_types,
     armor_layers_to_string_representation,
     get_armor_layers_from_string_representation,
+    DamageResult,
 )
 armor_db = PredefinedArmorDb()
 armor_db.load_json()
 damage_calculator = DamageCalculator()
-
 # Settings that are later written to local storage
 settings: Dict[str, Any] = collections.defaultdict(dict)
-
-
-def calculate_damage(ev=None) -> Tuple[Optional[int], str]:
+def calculate_damage(ev=None) -> DamageResult:
     damage = int(document["input_damage"].value)
     penetration = int(document["input_penetration"].value)
     damage_type = get_damage_type()
     if not damage_type:
-        return None, "Damage type not set"
+        return DamageResult(None, "Damage type not set")
     armor, armor_error = get_armor_layers()
     if armor_error:
         document["armor_selection_result"].html = armor_error
-        return None, armor_error
+        return DamageResult(None, armor_error)
     document[
         "armor_selection_result"
     ].html = armor_layers_to_string_representation(armor)
     assert damage_type
-    result, explanation_lines = damage_calculator.get_damage(
+    return damage_calculator.get_damage(
         damage=damage,
         damage_type=damage_type,
         penetration=penetration,
         armor_layers=armor,
     )
-    return result, explanation_lines
 def update_damage(ev=None):
     print("UPDATING")
-    damage, explanation = calculate_damage(ev)
-    if damage is None:
+    damage = calculate_damage(ev)
+    if damage.value is None:
         damage_str = "?"
     else:
-        damage_str = str(damage)
+        damage_str = str(damage.value)
     document["result"].html = damage_str
-    document["explanation"].html = "<br>\n".join(explanation.split("\n"))
+    document["explanation"].html = "<br>\n".join(damage.explanation.split("\n"))
 def get_damage_type() -> Optional[str]:
     """Returns the damage type that was selected."""
     for damage_type in damage_types:
@@ -62,14 +56,18 @@ def get_damage_type() -> Optional[str]:
 def get_armor_layers():
     body_part = get_body_part()
     armor = get_armor_selection()
+    settings["armor"] = armor
+    custom_armor_input = document["armor_selection_custom_input"].value.strip()
+    settings["custom_armor"] = custom_armor_input
     custom_armor = None
     if "custom" in armor:
         try:
             custom_armor = get_armor_layers_from_string_representation(
-                document["armor_selection_custom_input"].value.strip()
+                custom_armor_input
             )
         except ValueError:
             return None, "Couldn't parse custom armor setting string"
+    dump_settings_local_storage()
     return (
         armor_db.get_armor_layers(
             armor, body_part=body_part, custom=custom_armor
@@ -92,23 +90,16 @@ def setup_damage_types():
 
 
 def get_armor_selection() -> List[str]:
-    """Returns the name of the selected pre-configured piecues of armor
-    and also saves it to local storage
-    """
-    armor_selection = [
+    """Returns the name of the selected pre-configured pieces"""
+    return [
         name
         for name in [*list(armor_db), "custom"]
         if document[f"armor_selection_{name}"].checked
     ]
-    settings["armor"] = armor_selection
-    dump_settings_local_storage()
-    return armor_selection
 
 
 def dump_settings_local_storage():
     storage["main"] = json.dumps(settings)
-
-
 def restore_from_local_storage():
     """Tries to set things as they were last time"""
     if "main" not in storage:
@@ -120,9 +111,11 @@ def restore_from_local_storage():
     try:
         for name in settings["armor"]:
             document[f"armor_selection_{name}"].checked = True
+        document["armor_selection_custom_input"].value = settings[
+            "custom_armor"
+        ]
     except Exception as e:
         print(f"Couldn't restore settings: {e}")
-
 
 def setup_armor_selection():
     """Sets up checkboxes for each pre-configured piece of armor and an
