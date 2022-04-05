@@ -17,7 +17,7 @@ def driver():
     options.add_argument("--disable-gpu")
     options.add_argument("--disable-dev-shm-usage")
     options.add_argument("--no-sandbox")
-    options.headless = True
+    # options.headless = True
     return webdriver.Chrome(options=options)
 
 
@@ -47,6 +47,17 @@ def toggle_armor(driver, armor: str) -> None:
 
 def select_damage_type(driver, damage_type: str) -> None:
     driver.find_element_by_id(f"damage_type_{damage_type}").click()
+
+def select_body_part(driver, body_part: str) -> None:
+    driver.find_element_by_id(f"body_part_{body_part}").click()
+
+
+def get_armor_selection_result(driver) -> str:
+    return driver.find_element_by_id("armor_selection_result").text
+
+
+def set_custom_armor(driver, armor: str) -> None:
+    driver.find_element_by_id("armor_selection_custom_input").send_keys("LsLs")
 
 
 def set_int_slider(driver, slider_name: str, target: int) -> None:
@@ -81,15 +92,17 @@ def test_set_input_damage(session) -> None:
 def test_helmar(session):
     h = "Helmar's Warrior Priest Armour"
     toggle_armor(session, h)
+    assert get_armor_selection_result(session) == "HH M LsLs"
     assert get_result(session) == "0"
+    select_body_part(session, "head")
+    assert get_result(session) == "10"
+    select_body_part(session, "body")
     toggle_armor(session, h)
     assert get_result(session) == "10"
     toggle_armor(session, h)
-    set_penetration(session, 3)
-    assert get_result(session) == "2"
-
 
 def test_initial_state(session):
+    assert get_armor_selection_result(session) == "No layers."
     assert get_input_damage(session) == "10"
     assert (
         session.find_element_by_id("input_penetration").get_property("value")
@@ -98,6 +111,22 @@ def test_initial_state(session):
     assert get_result(session) == "10"
     select_damage_type(session, "e")
     assert get_result(session) == "10"
+
+
+def test_custom_armor(session):
+    set_custom_armor(session, "LsLs")
+    assert get_result(session) == "10"
+    toggle_armor(session, "custom")
+    assert get_result(session) == "6"
+
+
+def test_custom_and_shield(session):
+    h = "Helmar's Shield of Meginbald"
+    toggle_armor(session, h)
+    set_custom_armor(session, "LsLs")
+    toggle_armor(session, "custom")
+    assert get_armor_selection_result(session) == "HH LsLs"
+    assert get_result(session) == "2"
 
 
 if __name__ == "__main__":
