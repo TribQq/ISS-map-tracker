@@ -253,6 +253,6 @@ def setup():
     update_damage()
     update_armor_selection_mirror()
 
-    
+
 setup()
 setup_hide_loading_placeholders()
