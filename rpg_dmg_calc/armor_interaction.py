@@ -1,6 +1,7 @@
 from typing import List, Tuple, Dict, NamedTuple, Optional
 import json
 import csv
+
 # todo: use enums
 body_parts = {
     "head": "head",
@@ -18,10 +19,13 @@ damage_types = {
     "s": "slicing",
     "x": "energy",
 }
+
+
 class ArmorLayer:
     def __init__(self, armor_type: str, armor_points: int):
         self.armor_type = armor_type
         self.armor_points = armor_points
+
     @classmethod
     def from_string(cls, layer_code: str):
         for armor_type in armor_types:
@@ -29,31 +33,42 @@ class ArmorLayer:
                 if layer_code == armor_type * ap:
                     return cls(armor_type=armor_type, armor_points=ap)
         raise ValueError(f"Doesn't seem like a valid armor code: {layer_code}")
+
     def __repr__(self):
         return self.armor_type * self.armor_points
+
     def __eq__(self, other):
         return self.__dict__ == other.__dict__
+
+
 class PredefinedArmor:
     def __init__(
-        self, name: str, bodypart_to_layers: Dict[str, List[ArmorLayer]]
+            self, name: str, bodypart_to_layers: Dict[str, List[ArmorLayer]]
     ):
         self.name = name
         self._bodypart_to_layers = bodypart_to_layers
+
     def get_layers(self, body_part: str) -> List[ArmorLayer]:
         if body_part not in self._bodypart_to_layers:
             body_part = "default"
         return self._bodypart_to_layers[body_part]
+
+
 def armor_layers_to_string_representation(layers: List[ArmorLayer]) -> str:
     if layers:
         return " ".join([str(layer) for layer in layers])
     else:
         return "No layers."
+
+
 def get_armor_layers_from_string_representation(
-    string: str,
+        string: str,
 ) -> List[ArmorLayer]:
     return [
         ArmorLayer.from_string(ls) for ls in string.replace(",", " ").split()
     ]
+
+
 class PredefinedArmorDb:
     def __init__(self):
         self._armor_dict: Dict[str, PredefinedArmor] = {}
@@ -77,10 +92,10 @@ class PredefinedArmorDb:
             self._armor_dict[_new_armor.name] = _new_armor
 
     def get_armor_layers(
-        self,
-        names: List[str],
-        body_part="default",
-        custom=None,
+            self,
+            names: List[str],
+            body_part="default",
+            custom=None,
     ) -> List[ArmorLayer]:
         """Get armor layers provided by a list of armor elements at a specific
         body part.
@@ -98,18 +113,25 @@ class PredefinedArmorDb:
             else:
                 layers.extend(self[name].get_layers(body_part=body_part))
         return layers
+
     def __iter__(self):
         return iter(self._armor_dict)
+
     def __getitem__(self, item):
         return self._armor_dict[item]
+
     def items(self):
         return self._armor_dict.items()
+
+
 class DamageResult(NamedTuple):
     value: Optional[int]
     explanation: str
+
+
 class DamageCalculator:
     def __init__(
-        self, armor_interaction_path="data/armor_weapon_interaction.csv"
+            self, armor_interaction_path="data/armor_weapon_interaction.csv"
     ):
         self.armor_weapon_interaction: Dict[Tuple[str, str, int], int] = {}
         with open(armor_interaction_path) as csvfile:
@@ -122,13 +144,17 @@ class DamageCalculator:
                 key = (row[0], row[1], int(row[2]))
                 value = int(row[3])
                 self.armor_weapon_interaction[key] = value
+
     def get_damage(
-        self,
-        damage: int,
-        damage_type: str,
-        penetration: int,
-        armor_layers: List[ArmorLayer],
+            self,
+            damage: int,
+            damage_type: str,
+            penetration: int,
+            armor_layers: List[ArmorLayer],
+            ignored_armor_types: Optional[List[str]] = None,
     ) -> DamageResult:
+        if ignored_armor_types is None:
+            ignored_armor_types = []
         remaining_pen = penetration
         remaining_dam = damage
         explanation_lines = []
@@ -136,6 +162,9 @@ class DamageCalculator:
             at = armor_layer.armor_type
             ap = armor_layer.armor_points
             explanation_lines.append(f"--- {at} armor ({ap} AP) ---")
+            if at in ignored_armor_types:
+                explanation_lines.append(f"Armor type {at} is ignored")
+                continue
             pen_modifier = self.armor_weapon_interaction[(damage_type, at, ap)]
             explanation_lines.append(f"Pen modifier {pen_modifier}")
             remaining_pen = max(0, remaining_pen + pen_modifier)

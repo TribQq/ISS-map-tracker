@@ -17,7 +17,7 @@ def driver():
     options.add_argument("--disable-gpu")
     options.add_argument("--disable-dev-shm-usage")
     options.add_argument("--no-sandbox")
-    # options.headless = True
+    options.headless = True
     return webdriver.Chrome(options=options)
 
 
@@ -47,6 +47,7 @@ def toggle_armor(driver, armor: str) -> None:
 
 def select_damage_type(driver, damage_type: str) -> None:
     driver.find_element_by_id(f"damage_type_{damage_type}").click()
+
 
 def select_body_part(driver, body_part: str) -> None:
     driver.find_element_by_id(f"body_part_{body_part}").click()
@@ -89,6 +90,7 @@ def test_set_input_damage(session) -> None:
         set_input_damage(session, value)
         assert get_input_damage(session) == str(value)
 
+
 def test_helmar(session):
     h = "Helmar's Warrior Priest Armour"
     toggle_armor(session, h)
@@ -101,12 +103,13 @@ def test_helmar(session):
     assert get_result(session) == "10"
     toggle_armor(session, h)
 
+
 def test_initial_state(session):
     assert get_armor_selection_result(session) == "No layers."
     assert get_input_damage(session) == "10"
     assert (
-        session.find_element_by_id("input_penetration").get_property("value")
-        == "0"
+            session.find_element_by_id("input_penetration").get_property("value")
+            == "0"
     )
     assert get_result(session) == "10"
     select_damage_type(session, "e")
