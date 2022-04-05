@@ -10,17 +10,25 @@ from selenium.common.exceptions import WebDriverException
 
 @pytest.fixture(scope="session")
 def driver():
+    options = webdriver.ChromeOptions()
+    options.add_argument("start-maximized")
+    options.add_argument("disable-infobars")
+    options.add_argument("--disable-extensions")
+    options.add_argument("--disable-gpu")
+    options.add_argument("--disable-dev-shm-usage")
+    options.add_argument("--no-sandbox")
+    options.headless = True
+    return webdriver.Chrome(options=options)
+
+
+@pytest.fixture
+def session(driver):
     driver.delete_all_cookies()
     try:
         driver.execute_script("window.localStorage.clear();")
     except WebDriverException:
         # won't work before the first .get
         pass
-    return webdriver.Chrome()
-
-
-@pytest.fixture
-def session(driver):
     driver.get("http://0.0.0.0:8000/")
     return driver
 
