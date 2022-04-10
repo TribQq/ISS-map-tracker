@@ -13,9 +13,8 @@ notesApp(DjangoRest, React)/react_frontend/node_modules
 notesApp(DjangoRest, React)/react_frontend/public
 
 
-rpg_dmg_calc/rpg_dmg_calc_env
-rpg_dmg_calc/__pycache__
-rpg_dmg_calc/.pyc
-rpg_dmg_calc/.flake8
+rpg_dmg_calc(brython,  selenium)/rpg_dmg_calc_env
+rpg_dmg_calc(brython,  selenium)/__pycache__
+
 
 
