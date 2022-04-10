@@ -7,7 +7,7 @@ It is also a small experiment to try out client-side web programming with [bryth
 system testing with web browser automation using [selenium](https://www.selenium.dev/).
 
 
-![desc_img](https://github.com/TribQq/mini_apps/blob/master/rpg_dmg_calc(brython%2C%selenium)/description/rpg_dmc_calc.jpg)
+![desc_img](https://github.com/TribQq/mini_apps/blob/master/rpg_dmg_calc(brython%2C%20%20selenium)/description/rpg_dmc_calc.jpg)
 
 
 
