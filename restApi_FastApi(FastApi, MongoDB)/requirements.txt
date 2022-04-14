@@ -1,0 +1,16 @@
+asgiref
+autopep8
+
+click
+et-xmlfile
+fastapi
+h11
+openpyxl
+passlib
+pycodestyle
+pydantic
+pymongo
+starlette
+toml== 0.10.2
+typing-extension==3.10.0.0
+uvicorn

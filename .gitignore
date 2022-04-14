@@ -1,8 +1,9 @@
 .idea
+__pycache__
 
 in_process
 
-ISS_map_tracker(Kivy, Nasa_api, Tkinter)/__pycache__
+
 ISS_map_tracker(Kivy, Nasa_api, Tkinter)/iss_tracker_env
 ISS_map_tracker(Kivy, Nasa_api, Tkinter)/example
 ISS_map_tracker(Kivy, Nasa_api, Tkinter)/description_and_ideas.txt
@@ -14,7 +15,10 @@ notesApp(DjangoRest, React)/react_frontend/public
 
 
 rpg_dmg_calc(brython,  selenium)/rpg_dmg_calc_env
-rpg_dmg_calc(brython,  selenium)/__pycache__
 
 
 restApi_flask_mongo(Flask, MongoDb, Docker)/flask_mongo_env
+
+
+restApi_FastApi(FastApi, MongoDB)/fastApi_restapi_env
+restApi_FastApi(FastApi, MongoDB)/routes/comments.py
