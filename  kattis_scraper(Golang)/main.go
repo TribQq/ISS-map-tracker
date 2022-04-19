@@ -1,25 +1,22 @@
 package main
 
 import (
-	"fmt"
-	"net/http"
-	"net/http/cookiejar"
+	"github.com/gin-contrib/cors"
+	"github.com/gin-gonic/gin"
 
 	"github.com/TribQq/mini_apps/tree/master/%20kattis_scraper(Golang)/utils"
 )
 
 func main() {
-	// create a cookiejar to store cookies
-	jar, _ := cookiejar.New(nil)
-	app := utils.App{
-		Client: &http.Client{Jar: jar},
-	}
+	r := gin.Default()
+	r.MaxMultipartMemory = 8 << 20
+	r.Static("/", "./public")
+	r.Use(cors.New(cors.Config{
+		AllowOrigins: []string{"https://djwebapp.herokuapp.com", "http://localhost:3000"},
+		AllowMethods: []string{"GET", "PUT", "POST"},
+	}))
 
-	app.Login()
+	r.POST("/kattis", utils.GetProblemsHandler)
 
-	problems := app.GetProblems()
-
-	for index, pb := range problems {
-		fmt.Printf("%d: %s, %.1f, %s\n", index+1, pb.Name, pb.Difficulty, pb.Link)
-	}
+	r.Run()
 }

@@ -1,5 +1,7 @@
 .idea
 __pycache__
+.env 
+.env.test
 
 in_process
 
