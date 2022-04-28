@@ -3,6 +3,8 @@ __pycache__
 .env 
 .env.test
 
+*comments.md
+
 in_process
 
 

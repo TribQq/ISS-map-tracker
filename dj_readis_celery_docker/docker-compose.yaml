@@ -1,0 +1,23 @@
+version: "3.7"
+
+
+services:
+  redis:
+    image: redis
+    restart: always
+
+  webapp:
+    restart: always
+    build:
+      context: ./webapp
+    ports:
+      - "8000:8000"
+    command: ["python3", "./project_dj_redis/manage.py", "runserver", "0.0.0.0:8000"]
+
+  worker:
+    restart: always
+    build:
+      context: ./webapp
+    volumes:
+      - ./cats:/app/project_dj_redis/cats
+    command: ['celery', '--workdir=./project_dj_redis', '-A', 'dj_redis', 'worker' ]
