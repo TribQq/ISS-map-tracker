@@ -31,7 +31,7 @@ python manage.py runserver
 ```
 
 
-![desc_img](https://github.com/TribQq/mini_apps/blob/master/notesApp(DjangoRest%2C%20React)/media/notesApp_desc.png)
+![desc_img](assets/description/notesApp_desc.png)
 
 
 
