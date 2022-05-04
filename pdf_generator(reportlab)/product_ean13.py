@@ -23,6 +23,8 @@ Adjust pagesize, number of labels, barcode size and
 positions of barcode and description to your needs.
 """
 
+# ------------------------------------ config -----------------------------------------
+
 pdfmetrics.registerFont(TTFont('FreeSans', 'FreeSans.ttf'))
 
 PAGE_SIZE = (2.9 * inch, 2 * inch)  # configurate pdf page size here( A4,A10, etc, or custom(example: 2.5*ich,2*ich)
@@ -40,10 +42,11 @@ MAX_NAME_LINES = 2 # example text == [line1,line2,line3] MAX_NAME_LINES==2 => te
 TEXT_CONFIG = {"MARGIN_TEXT": 12, "TEXT_SIZE": 10}
 LONG_TEXT_CONFIG = {"MARGIN_TEXT": 10, "TEXT_SIZE": 8} # if some text so long, we use this config
 
-
 LABEL_WIDTH = PAGE_SIZE[0] / NUM_LABELS_X
 LABEL_HEIGHT = PAGE_SIZE[1] / NUM_LABELS_Y
 SHEET_TOP = PAGE_SIZE[1]
+
+# -----------------------------------------------------------------------------
 
 
 def generate_text_lines(text_list: list, max_line_len: int) -> list[str, ...]:
