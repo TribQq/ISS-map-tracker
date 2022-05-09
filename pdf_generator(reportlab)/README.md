@@ -13,7 +13,7 @@ Easy to customize,all settings at the beginning of the file
 virtualenv pdf_env -p python3.10
 pip install -r requirements.txt
 source pdf_env/bin/activate
-python3
+python3 product_ean13.py
 ```
 
 <img src="assets/description/pdf_example.png">
