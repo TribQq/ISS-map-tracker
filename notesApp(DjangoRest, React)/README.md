@@ -2,7 +2,7 @@
 
 # NotesApp
 
-Integrated in <a href="https://github.com/TribQq/web">this</a> app now, web example <a href="https://djwebapp.herokuapp.com/notesApp/#/notes">link</a>
+Integrated in <a href="https://github.com/TribQq/web">this</a> app now, web example <a href="https://djwebapp.herokuapp.com/portfolio/notesApp/#/notes">link</a>
 
 <h3>Tech used:  </h3>
 <ul>
